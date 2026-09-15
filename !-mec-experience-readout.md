@@ -56,6 +56,12 @@ For training, Martin configured warm-start transfer learning starting from a pre
 
 Martin also wrote and maintained the full GPU provisioning runbook for deploying RADTTS inference on AWS. The procedure covered: launching a g4dn.xlarge Ubuntu 22.04 instance with 104 GB of storage, locking PEM file permissions, SSHing into the instance, installing the CUDA toolkit configured for the specific Linux target via the NVIDIA installer, verifying GPU availability via PyTorch and nvidia-smi, transferring fine-tuned model checkpoints and training data to the instance via SCP, and installing all RADTTS Python dependencies. This represents end-to-end hands-on GPU instance provisioning, not just model training — directly relevant to Luma's requirement for deep familiarity with managing GPU resources on cloud hardware.
 
+### WER-Based Voice Clone Evaluation
+
+**Platform context:** Evaluating whether the RADTTS voice clone was improving or degrading across training iterations required an objective, repeatable measure — with one engineer, no labeling budget, and no existing benchmark for cloned rap vocals.
+
+**What Martin built:** A round-trip WER evaluation pipeline: feed the fine-tuned model a known transcript, synthesize audio, run that audio through speech-to-text, and compute word error rate between the STT output and the original transcript. The known transcript made ground truth free, requiring no human labeling. Training runs were tracked in Weights & Biases, so WER deltas mapped to specific checkpoint and data changes, and the resulting quality signal decided which checkpoints shipped.
+
 ### LLM Fine-Tuning: GPT-J Lyric Generation
 
 **Platform context:** RapBot's lyric generation feature needed to produce rap lyrics that rhymed correctly, matched a given topic, and felt stylistically authentic. Martin first used OpenAI's GPT-3 Davinci via API fine-tuning, then replaced it with a self-hosted open-source model to eliminate per-token API costs and gain full control over inference.
@@ -100,6 +106,12 @@ Martin Connor's verified contributions span hundreds of commits across the full 
 
 **What Martin built:** A hybrid retrieval service combining BM25 Okapi keyword search for exact and lexical matching with dense vector cosine similarity search for semantic relevance. The two scores are combined with a tunable blend weight, allowing the system to be adjusted toward keyword precision or semantic recall depending on the agent's use case. Martin identified that the embedding model powering semantic search was being instantiated fresh on every inference request — a significant latency and resource inefficiency — and refactored it to a process-level singleton that loads once at server startup and is reused for all subsequent requests. The hybrid approach improved retrieval accuracy by 13% as measured by automated LLM-as-judge evaluations using the RAGAS framework, which Martin also set up and ran.
 
+### LLM-as-Judge Evaluation Pipeline (Release Gating)
+
+**Platform context:** Every Prism release required manual review of agent behavior across the platform's production agents — slow, inconsistent, and unrepeatable, with regressions able to reach employees before anyone noticed.
+
+**What Martin built:** An LLM-as-judge evaluation pipeline using DeepEval covering 4 production agents, with per-agent test suites encoding expected behaviors judged automatically against defined criteria. Martin parallelized test execution, turning a serial afternoon of checks into minutes, and wired the results into the release process as a repeatable gate rather than an optional report — cutting manual per-release QA review time by 4 hours.
+
 ### Tool-Calling and API Architecture for AI Agents
 
 **Platform context:** Prism agents need to call external tools and data sources during inference — fetching live data from BigQuery, querying SQL databases, calling downstream Microsoft Copilot agents, and performing document retrieval. Each tool needs typed input validation, streaming-compatible output, and clean error handling.
@@ -130,6 +142,18 @@ All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model g
 ### User Access Management Infrastructure
 
 **What Martin built:** A suite of Python CLI scripts for managing user access to the platform — user upsert, access validation, deletion, bulk removal, and per-agent access grants and revocations. Used by the platform's operations team to onboard users and manage access at scale, and a prerequisite for safely rolling out new agents to specific business units before broader release.
+
+## Hy-Vee, Inc. (Jan 2023 – Aug 2024)
+
+Hy-Vee is a large grocery chain; Martin was a Senior Software Engineer owning core systems on its loyalty platform serving 100K+ members, delivering personalized promotions across digital and in-store points of sale.
+
+**What Martin built:** Standardized the sign-up process across multiple web apps built with Next.js, TypeScript, and GraphQL, reducing sign-up funnel abandonment 7%. Built gamified "trip challenge" shopping experiences using MSSQL and GraphQL, growing departmental revenue 9%. Tuned high-volume promotion workflows using targeted data fetching, pagination, and Redis caching to keep offer flows resilient under high traffic.
+
+## Waterfield Technologies (Oct 2021 – Dec 2022)
+
+Waterfield built cloud contact-center platforms for external clients, productizing Twilio APIs into a reusable SaaS offering. Martin was a Senior Software Engineer who also led a team of 4 developers (2 senior, 2 junior) responsible for over $1.1M in department revenue — running stand-ups, performance reviews, and one-on-ones.
+
+**What Martin built:** Defined and validated technical acceptance criteria — latency targets, throughput limits, and error budgets — via load and failure testing, proving $1.2M in contractual SLA commitments. Consolidated four separate agent workflows into a single state-driven application, cutting average call time 7 minutes. Migrated a client's call center from Avaya to a custom Twilio platform designed for stateless call flows and horizontal scaling, increasing concurrent call capacity 2.5x. Architected pre-sales solutions used as the definition of done in scopes of work.
 
 ## DrayNow, Inc. (Sep 2019 – Oct 2021)
 
