@@ -1,6 +1,6 @@
 # Martin Connor — Engineering Work Summary
 
-**Prepared for:** Software Engineer, ML Platform — Luma AI
+A factual basis for generating résumés for specific job descriptions.
 
 This document summarizes work Martin Connor personally built, verified by reading his git commits and source code across multiple repositories. It is intended as a factual basis for resume generation. Each section opens with platform context, followed by what Martin specifically built.
 
@@ -127,7 +127,7 @@ Martin Connor's verified contributions span hundreds of commits across the full 
 - **Atlas Assist (legal agent):** Legal research agent serving NBCU employees with questions about contracts, firm contacts, and legal resources. Martin built Legal Lookup and Firm Finder subagents that route specific query types to SharePoint-sourced knowledge bases via structured tool calls. He wrote and iterated the system prompt, added intelligent nickname handling so the agent could match formal legal names when users provided informal ones, and added prompt injection resistance.
 - **HR Thrive:** HR knowledge agent built from initial configuration through production — system prompt design, RAG corpus setup, user access provisioning, and suggested prompt curation. Reduced HR Tier-1 response time 10%.
 - **OmniAgent:** General-purpose agent; Martin managed access provisioning and brand identity.
-- **Computer-use agent:** Replaced a brittle legacy media-fulfillment integration by autonomously completing intake workflows, cutting average response time 1.5 days.
+- **Computer-use agent:** Replaced a brittle legacy media-fulfillment integration by autonomously completing intake workflows, cutting average response time 0.5 days.
 
 All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model generations.
 
@@ -157,7 +157,7 @@ Waterfield built cloud contact-center platforms for external clients, productizi
 
 ## DrayNow, Inc. (Sep 2019 – Oct 2021)
 
-DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Software Engineer II owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing mobile app.
+DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Senior Software Engineer owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing mobile app.
 
 **What Martin built:** Deployed the marketplace on Docker with AWS ECS/Fargate for horizontal autoscaling, with Traefik automating SSL certificate renewal for production URLs. Built event-driven flows on AWS SQS/SNS and Lambda microservices, including automated removal of drivers with expired licenses via the DMV's API. Replaced a bespoke invoice-processing pipeline (Lambda/S3/cron) with a Boomi integration importing invoices into NetSuite with proper retry logic and exponential backoff — cutting accounting costs $60K/year and reducing erroring documents 20%. Built versioned pricing models on S3/Python recommending guaranteed-sale prices to vendors.
 
