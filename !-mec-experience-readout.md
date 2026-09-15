@@ -6,27 +6,30 @@ This document summarizes work Martin Connor personally built, verified by readin
 
 ## Core Competencies (master list)
 
-- **Agent Platforms** — multi-agent architecture, subagent routing, typed tool-calling registries (Pydantic), computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control, MCP servers
+Resume competency lines are selected and trimmed from this list. First line on every resume is `Core Stack`, naming the hardcore basics the JD asks for.
+
+- **Core Stack** — Python, TypeScript, SQL, FastAPI, Next.js/React, React Native, REST APIs, GraphQL, Git, Unix shell
+- **Agent Systems** — multi-agent architecture, subagent routing, MCP servers, typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
 - **Agent Optimization** — model routing, token-spend configuration, context management, conversation-history summarization, semantic response caching
 - **LLM Inference** — streaming inference runtimes (GPT/Claude/Gemini), Chat Completions to Responses API migration, streaming-event state machines, multi-turn message transformation, model migrations (GPT-3.5 to GPT-5)
 - **Retrieval & RAG** — hybrid BM25 + dense-vector retrieval, tunable blend weighting, embedding-model serving, document ingestion and vectorization pipelines (Azure Logic Apps, Azure Functions, SharePoint), content lifecycle and exclusion rules, blob cleanup
-- **Access Control & Security** — per-user RAG permission middleware (Entra ID, Microsoft Graph), per-agent access provisioning CLI, user upsert/validation/bulk removal, Key Vault secrets, encrypted secrets injection
-- **AI Evaluation** — LLM-as-judge harnesses (DeepEval, RAGAS), release quality gates, WER-based speech evaluation, retrieval-accuracy measurement, generation-success metrics, feedback-correlated analytics, weak-supervision labeling
+- **Access Control** — authentication middleware (Entra ID/MS Graph), per-user RAG permission middleware, per-agent access provisioning CLI, user upsert/validation/bulk removal, Key Vault secrets, encrypted secrets injection
+- **LLM Evaluation** — LLM-as-judge harnesses (DeepEval, RAGAS), release quality gates, WER-based speech evaluation, retrieval-accuracy measurement, generation-success metrics, feedback-correlated analytics, weak-supervision labeling
 - **Model Development** — LLM fine-tuning (GPT-3 Davinci, GPT-J 6B), INT8 quantization (bitsandbytes), constrained beam-search decoding, multi-task training schemas, neural TTS fine-tuning (RADTTS), music generation (MusicGen), PyTorch DistributedDataParallel, mixed-precision training, RAdam, warm-start transfer learning, layer freezing
 - **Speech & Audio ML** — STT integration (Whisper), source separation (Demucs), word-level forced alignment, FFmpeg filter graphs, FFmpeg WebAssembly, latency-optimized generation
 - **Data Pipelines** — 5-service containerized corpus pipeline (~400K songs), scraping, deduplication by content hashing, transcript normalization, dataset curation, experiment tracking (Weights & Biases)
 - **GPU Fleet & Job Scheduling** — PostgreSQL-backed job orchestration (pgboss), full lifecycle tracking, per-job-type retry/expiry, self-rescheduling workers, provider-agnostic dispatch (AWS EC2, RunPod, Banana.dev), inference cost optimization
 - **Inference Deployment** — containerized model serving (Docker Compose, AWS ECS/Fargate, Azure Container Apps), zero-downtime model hotswapping, CUDA-enabled Linux runtimes, GPU instance provisioning (g4dn), blob storage artifact handoff (S3), Traefik reverse proxy/TLS
-- **Event-Driven Systems** — AWS SQS/SNS, Lambda microservices, WebSocket push (Pusher), Slack webhook alerting, async polling
-- **Frontend & Design Systems** — React, Next.js, TypeScript, React Native, shared component library (shadcn/ui, Radix, Tailwind), design tokens, theming, internal package publishing, Vite
+- **Event-Driven Systems** — AWS SQS/SNS, Lambda microservices, WebSocket push (Pusher), Slack webhook alerting, async polling, job scheduling
+- **Design Systems** — shared React component library (shadcn/ui, Tailwind), theming, design tokens, internal package publishing
 - **API Design** — REST, GraphQL, Swagger/OpenAPI, FastAPI, service-oriented architecture, parameterized SQL templates
-- **Data Stores** — PostgreSQL, MSSQL, CosmosDB, Redis caching, BigQuery, S3/blob storage
-- **Observability & Analytics** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting
-- **CI/CD & IaC** — GitHub Actions, Terraform, automated secrets injection, rollback-hardened releases, multi-environment workflow deployment
-- **AI Coding Agents** — Claude Code for daily feature work, `CLAUDE.md`/`AGENTS.md` conventions, custom skills, agent guardrails and context engineering
+- **Databases** — PostgreSQL, MSSQL, CosmosDB, Redis, Aurora, BigQuery, S3/blob storage
+- **Infrastructure & Operations** — AWS (EC2/S3/SSM/Lightsail/CloudWatch/Aurora/Route 53/Lambda/Polly/ECS/Fargate), Azure (Container Apps/CosmosDB/Key Vault/Logic Apps/Functions), GCP, Docker, Terraform, GitHub Actions, CI/CD, automated secrets injection, rollback-hardened releases, multi-environment workflow deployment
+- **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting
+- **AI Coding Agents** — GitHub Copilot, custom agentic skills, Claude Code, CLAUDE.md/AGENTS.md conventions, token optimization, agent guardrails and context engineering
 - **Integrations** — Boomi/NetSuite, Twilio, DMV API, Microsoft Copilot agents
 - **Leadership** — led team of 4 engineers ($1.1M revenue), pre-sales architecture, SLA definition via load testing, design and code reviews
-- **Core Stack** — Python, TypeScript, SQL, Git, Unix shell
+
 
 ## RapBot.ai (Jan 2019 – May 2026)
 
@@ -166,6 +169,22 @@ All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model g
 ### User Access Management Infrastructure
 
 **What Martin built:** A suite of Python CLI scripts for managing user access to the platform — user upsert, access validation, deletion, bulk removal, and per-agent access grants and revocations. Used by the platform's operations team to onboard users and manage access at scale, and a prerequisite for safely rolling out new agents to specific business units before broader release.
+
+### Per-User RAG Permission Middleware (Entra ID / Microsoft Graph)
+
+**Platform context:** Prism originally relied on Microsoft Copilot's built-in retrieval over SharePoint, which was slow and gave poor answers. Replacing it with Prism's own RAG meant Prism now had to enforce document-level permissions itself.
+
+**What Martin built:** Hand-rolled authorization middleware for the RAG pipeline. When a user's question would be answered by a SharePoint document, the middleware checked that user's Entra ID identity against the document's permissions via the Microsoft Graph API before the content could reach the agent's answer. Locked-down documents never surfaced to users who lacked access.
+
+### Prism Portal Shared Component Library (Design System)
+
+**Platform context:** Prism Portal is the agentic user interface for the Prism platform. As other NBCU teams began building their own agent interfaces, design consistency across teams became a problem.
+
+**What Martin built:** Martin's team built and maintained Prism Portal's shared React/TypeScript component library, starting from shadcn/ui and Tailwind. It grew into an internal package with theming and design tokens that was published so other NBCU teams could build agent interfaces with consistent UI.
+
+### AI Coding Agents in Daily Work
+
+Martin uses GitHub Copilot and Claude Code daily for feature work. He authors CLAUDE.md and AGENTS.md conventions and custom agentic skills that give coding agents repo context and guardrails, and tunes token usage.
 
 ## Hy-Vee, Inc. (Jan 2023 – Aug 2024)
 
