@@ -8,7 +8,7 @@ This document summarizes work Martin Connor personally built, verified by readin
 
 Resume competency lines are selected and trimmed from this list. First line on every resume is `Core Stack`, naming the hardcore basics the JD asks for.
 
-- **Core Stack** — Python, TypeScript, SQL, FastAPI, Next.js/React, React Native, REST APIs, GraphQL, Git, Unix shell
+- **Core Stack** — Python, TypeScript, Node.js, Express, SQL, FastAPI, Next.js/React, React Native, REST APIs, Git, Unix shell
 - **Agent Systems** — multi-agent architecture, subagent routing, MCP servers, typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
 - **Agent Optimization** — model routing, token-spend configuration, context management, conversation-history summarization, semantic response caching
 - **LLM Inference** — streaming inference runtimes (GPT/Claude/Gemini), Chat Completions to Responses API migration, streaming-event state machines, multi-turn message transformation, model migrations (GPT-3.5 to GPT-5)
@@ -115,6 +115,10 @@ Martin also wrote and maintained the full GPU provisioning runbook for deploying
 
 All five services were Docker-containerized and coordinated by the job scheduling system described above. The output was a corpus of approximately 400,000 aligned songs used as training data for TTS and lyric generation models.
 
+### Node.js Backend
+
+Built the platform's Node.js/Express API from scratch: custom route handlers for song generation, custom authentication middleware, and the pgboss job scheduler running in the same Node process.
+
 ## NBCUniversal (Aug 2024 – Present)
 
 NBCUniversal built an internal enterprise AI agent platform called Prism. It is a full-stack web application where NBCU employees interact with AI agents configured for specific business workflows — each agent has a system prompt, a selected LLM, connectors to enterprise data sources like SharePoint, and a set of callable tools. The backend is FastAPI (Python), the frontend is Next.js (TypeScript), and the system runs on Azure: Azure Container Apps for compute, Azure CosmosDB for conversation history, Azure Key Vault for secrets management, and Azure OpenAI as the LLM provider. The platform serves agents for multiple NBCU business units including legal, HR, ad sales, and media operations.
@@ -203,6 +207,10 @@ Waterfield built cloud contact-center platforms for external clients, productizi
 DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Senior Software Engineer owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing cross-platform React Native mobile app.
 
 **What Martin built:** Deployed the marketplace on Docker with AWS ECS/Fargate for horizontal autoscaling, with Traefik automating SSL certificate renewal for production URLs. Built event-driven flows on AWS SQS/SNS and Lambda microservices, including automated removal of drivers with expired licenses via the DMV's API. Replaced a bespoke invoice-processing pipeline (Lambda/S3/cron) with a Boomi integration importing invoices into NetSuite with proper retry logic and exponential backoff — cutting accounting costs $60K/year and reducing erroring documents 20%. Built versioned pricing models on S3/Python recommending guaranteed-sale prices to vendors.
+
+### Node.js Backend
+
+Built the marketplace's Node.js/Express API from scratch: custom route handlers for pricing, dispatch, and invoicing, plus custom authentication middleware protecting driver and broker endpoints.
 
 ### DrayNow — Guaranteed Price Model Maintenance
 
