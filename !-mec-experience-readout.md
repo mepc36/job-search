@@ -9,23 +9,25 @@ This document summarizes work Martin Connor personally built, verified by readin
 Resume competency lines are selected and trimmed from this list. First line on every resume is `Core Stack`, naming the hardcore basics the JD asks for.
 
 - **Core Stack** — Python, TypeScript, Node.js, Express, SQL, FastAPI, Next.js/React, React Native, REST APIs, Git, Unix shell
-- **Agent Systems** — multi-agent architecture, subagent routing, MCP servers, typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
+- **Agent Systems** — multi-agent architecture, subagent routing, MCP servers, Vertex AI (Gemini), typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
+- **Virtual Agents** — platform-agnostic virtual agents, TwiML, Twilio Flex, Dialogflow CX, Amazon Lex, Watson, IVR call flows, warm transfers, screen pops
 - **Agent Optimization** — model routing, token-spend configuration, context management, conversation-history summarization, semantic response caching
 - **LLM Inference** — streaming inference runtimes (GPT/Claude/Gemini), Chat Completions to Responses API migration, streaming-event state machines, multi-turn message transformation, model migrations (GPT-3.5 to GPT-5)
 - **Retrieval & RAG** — hybrid BM25 + dense-vector retrieval, tunable blend weighting, embedding-model serving, document ingestion and vectorization pipelines (Azure Logic Apps, Azure Functions, SharePoint), content lifecycle and exclusion rules, blob cleanup
 - **Access Control** — authentication middleware (Entra ID/MS Graph), per-user RAG permission middleware, per-agent access provisioning CLI, user upsert/validation/bulk removal, Key Vault secrets, encrypted secrets injection
+- **Compliance** — privacy impact assessments (PIA), PII and HIPAA compliance, audit log aggregation, data storage, location, and retention policies
 - **LLM Evaluation** — LLM-as-judge harnesses (DeepEval, RAGAS), release quality gates, WER-based speech evaluation, retrieval-accuracy measurement, generation-success metrics, feedback-correlated analytics, weak-supervision labeling
 - **Model Development** — LLM fine-tuning (GPT-3 Davinci, GPT-J 6B), INT8 quantization (bitsandbytes), constrained beam-search decoding, multi-task training schemas, neural TTS fine-tuning (RADTTS), music generation (MusicGen), PyTorch DistributedDataParallel, mixed-precision training, RAdam, warm-start transfer learning, layer freezing
 - **Speech & Audio ML** — STT integration (Whisper), source separation (Demucs), word-level forced alignment, FFmpeg filter graphs, FFmpeg WebAssembly, latency-optimized generation
 - **Data Pipelines** — 5-service containerized corpus pipeline (~400K songs), scraping, deduplication by content hashing, transcript normalization, dataset curation, experiment tracking (Weights & Biases)
 - **GPU Fleet & Job Scheduling** — PostgreSQL-backed job orchestration (pgboss), full lifecycle tracking, per-job-type retry/expiry, self-rescheduling workers, provider-agnostic dispatch (AWS EC2, RunPod, Banana.dev), inference cost optimization
 - **Inference Deployment** — containerized model serving (Docker Compose, AWS ECS/Fargate, Azure Container Apps), zero-downtime model hotswapping, CUDA-enabled Linux runtimes, GPU instance provisioning (g4dn), blob storage artifact handoff (S3), Traefik reverse proxy/TLS
-- **Event-Driven Systems** — AWS SQS/SNS, Lambda microservices, WebSocket push (Pusher), Slack webhook alerting, async polling, job scheduling
+- **Event-Driven Systems** — AWS SQS/SNS, Lambda microservices, server-sent events (SSE), Slack webhook alerting, async polling, job scheduling
 - **Design Systems** — shared React component library (shadcn/ui, Tailwind), theming, design tokens, internal package publishing
 - **API Design** — REST, GraphQL, Swagger/OpenAPI, FastAPI, service-oriented architecture, parameterized SQL templates
-- **Databases** — PostgreSQL, MSSQL, CosmosDB, Redis, Aurora, BigQuery, S3/blob storage
-- **Infrastructure & Operations** — AWS (EC2/S3/SSM/Lightsail/CloudWatch/Aurora/Route 53/Lambda/Polly/ECS/Fargate), Azure (Container Apps/CosmosDB/Key Vault/Logic Apps/Functions), GCP, Docker, Terraform, GitHub Actions, CI/CD, automated secrets injection, rollback-hardened releases, multi-environment workflow deployment
-- **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting
+- **Databases** — PostgreSQL, MSSQL, CosmosDB, Redis, Aurora, BigQuery, S3/blob storage, JSONB query optimization, trigger-synced materialized tables
+- **Infrastructure & Operations** — AWS (EC2/S3/SSM/Lightsail/CloudWatch/Aurora/Route 53/Lambda/Polly/ECS/Fargate), Azure (Container Apps/CosmosDB/Key Vault/Logic Apps/Functions), GCP (Vertex AI, BigQuery), Docker, Terraform, GitHub Actions, CI/CD, automated secrets injection, rollback-hardened releases, multi-environment workflow deployment
+- **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting, CloudWatch alarms (error-rate and health-check thresholds), Slack webhook alerting, on-host debugging (nvidia-smi, memory profiling), Terraform-provisioned GPU instances
 - **AI Coding Agents** — GitHub Copilot, custom agentic skills, Claude Code, CLAUDE.md/AGENTS.md conventions, token optimization, agent guardrails and context engineering
 - **Integrations** — Boomi/NetSuite, Twilio, DMV API, Microsoft Copilot agents
 - **Leadership** — led team of 4 engineers ($1.1M revenue), pre-sales architecture, SLA definition via load testing, design and code reviews
@@ -115,6 +117,16 @@ Martin also wrote and maintained the full GPU provisioning runbook for deploying
 
 All five services were Docker-containerized and coordinated by the job scheduling system described above. The output was a corpus of approximately 400,000 aligned songs used as training data for TTS and lyric generation models.
 
+### CloudWatch Alarms and Slack Alerting (rapBot and DrayNow)
+
+**Platform context:** Both rapBot and DrayNow ran production services on AWS EC2 and needed to know about outages before users reported them.
+
+**What Martin built:** CloudWatch alarms on the production EC2 hosts, wired to a Slack webhook. One alarm aggregated 5XX error rate and fired when it exceeded 1% of requests over two consecutive 5-minute windows, which avoided flapping on transient spikes. A second alarm hit a health-status endpoint every minute and fired after 3 consecutive failures, so a container restart during a deploy did not page but real downtime did within about 3 minutes. The same setup was used at DrayNow.
+
+### Server-Sent Events for Long-Running Jobs
+
+Hand-rolled a server-sent event stream that pushed completion events for long-running media transcoding and audio synthesis jobs back to the React frontend, replacing long polling. Users could fire a synthesis request and keep writing lyrics while it ran, so traffic stayed smooth instead of bursty, and every job's lifecycle was visible for auditing through the GPU job scheduler.
+
 ### Node.js Backend
 
 Built the platform's Node.js/Express API from scratch: custom route handlers for song generation, custom authentication middleware, and the pgboss job scheduler running in the same Node process.
@@ -135,7 +147,7 @@ Martin Connor's verified contributions span hundreds of commits across the full 
 
 **Platform context:** Prism's agents answer questions by retrieving relevant context from enterprise knowledge bases — SharePoint documents, HR policy files, legal reference data — before generating a response. The platform needed a retrieval system that could handle both conceptual semantic queries and precise keyword lookups against the same corpus.
 
-**What Martin built:** A hybrid retrieval service combining BM25 Okapi keyword search for exact and lexical matching with dense vector cosine similarity search for semantic relevance. The two scores are combined with a tunable blend weight, allowing the system to be adjusted toward keyword precision or semantic recall depending on the agent's use case. Martin identified that the embedding model powering semantic search was being instantiated fresh on every inference request — a significant latency and resource inefficiency — and refactored it to a process-level singleton that loads once at server startup and is reused for all subsequent requests. The hybrid approach improved retrieval accuracy by 13% as measured by automated LLM-as-judge evaluations using the RAGAS framework, which Martin also set up and ran.
+**What Martin built:** A hybrid retrieval service combining BM25 Okapi keyword search for exact and lexical matching with dense vector cosine similarity search for semantic relevance. The two scores are combined with a tunable blend weight, allowing the system to be adjusted toward keyword precision or semantic recall depending on the agent's use case. Martin identified that the embedding model powering semantic search was being instantiated fresh on every inference request — a significant latency and resource inefficiency — and refactored it to a process-level singleton that loads once at server startup and is reused for all subsequent requests. The hybrid approach improved retrieval accuracy by 13% as measured by automated LLM-as-judge evaluations using the DeepEval framework.
 
 ### LLM-as-Judge Evaluation Pipeline (Release Gating)
 
@@ -180,11 +192,33 @@ All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model g
 
 **What Martin built:** Hand-rolled authorization middleware for the RAG pipeline. When a user's question would be answered by a SharePoint document, the middleware checked that user's Entra ID identity against the document's permissions via the Microsoft Graph API before the content could reach the agent's answer. Locked-down documents never surfaced to users who lacked access.
 
+### Token-Spend Controls (Agent Optimization)
+
+**Platform context:** Prism serves many business units whose queries range from simple lookups to multi-document reasoning, and sending everything to the largest model wasted tokens.
+
+**What Martin built:** Prism's token-spend controls: a trained prompt classifier routing simple lookups (firm-contact queries) to a small model and multi-document reasoning (indemnification risk across contracts) to GPT-5.6; manual history summarization of chat session state in CosmosDB; and a hand-rolled semantic response cache in CosmosDB, configurable per business unit.
+
+### Privacy Impact Assessment for Atlas Assist (PII/HIPAA Compliance)
+
+**Platform context:** Atlas Assist, an LLM agent supporting NBCU's legal resources, handled PII and HIPAA information, so it had to pass a privacy impact assessment reviewed by NBCU's legal team.
+
+**What Martin built:** Ensured compliance with all relevant PII and HIPAA laws during the privacy impact review for Atlas Assist. He aggregated audit logs and architected data storage, location (on-prem vs. cloud, geographic region), and retention policies, documented in architecture diagrams that NBCU's legal team reviewed.
+
 ### Prism Portal Shared Component Library (Design System)
 
 **Platform context:** Prism Portal is the agentic user interface for the Prism platform. As other NBCU teams began building their own agent interfaces, design consistency across teams became a problem.
 
 **What Martin built:** Martin's team built and maintained Prism Portal's shared React/TypeScript component library, starting from shadcn/ui and Tailwind. It grew into an internal package with theming and design tokens that was published so other NBCU teams could build agent interfaces with consistent UI.
+
+### Vertex AI Multi-Agent Guest Assistant
+
+Built a multi-agent guest assistant on GCP Vertex AI for a theme park: agents with knowledge stores and tool calls answering dining and ride-schedule questions with real-time park data.
+
+### Lyra-2 World Model Inference: On-Host OOM Debugging
+
+**Platform context:** As part of NBCU's world-model exploration, Martin ran NVIDIA's Lyra-2 world model for splat inference on a g7e.2xlarge EC2 instance provisioned with Terraform. Splat libraries compile their CUDA kernels on first import, and the compile step kept crashing.
+
+**What Martin built:** Working over SSH on the host, Martin diagnosed the crashes as out-of-memory kills during CUDA kernel compilation: the MAX_JOBS setting was launching too many parallel compiler processes and exhausting host memory. He capped MAX_JOBS at 4, holding memory usage near 60% while preserving build speed, and inference ran cleanly after the fix.
 
 ### AI Coding Agents in Daily Work
 
@@ -200,9 +234,15 @@ Hy-Vee is a large grocery chain; Martin was a Senior Software Engineer owning co
 
 Waterfield built cloud contact-center platforms for external clients, productizing Twilio APIs into a reusable SaaS offering. Martin was a Senior Software Engineer who also led a team of 4 developers (2 senior, 2 junior) responsible for over $1.1M in department revenue — running stand-ups, performance reviews, and one-on-ones.
 
-**What Martin built:** Defined and validated technical acceptance criteria — latency targets, throughput limits, and error budgets — via load and failure testing, proving $1.2M in contractual SLA commitments. Consolidated four separate agent workflows into a single state-driven application, cutting average call time 7 minutes. Migrated a client's call center from Avaya to a custom Twilio platform designed for stateless call flows and horizontal scaling, increasing concurrent call capacity 2.5x. Architected pre-sales solutions used as the definition of done in scopes of work.
+**What Martin built:** Defined and validated technical acceptance criteria — latency targets, throughput limits, and error budgets — via load and failure testing, proving $1.2M in contractual SLA commitments. Consolidated four separate agent workflows into a single state-driven application, cutting average call time 7 minutes. Migrated a client's call center from Avaya to a custom Twilio platform designed for stateless call flows and horizontal scaling, caching phone call details in Redis, increasing concurrent call capacity 2.5x. Architected pre-sales solutions used as the definition of done in scopes of work.
 
-## DrayNow, Inc. (Sep 2019 – Oct 2021)
+### Navient Virtual Agent (Platform-Agnostic)
+
+**Platform context:** Navient, a student-loan servicer, needed a virtual agent to triage customer calls before they reached human agents.
+
+**What Martin built:** A platform-agnostic virtual agent running on Twilio (TwiML) and portable to Dialogflow CX and Amazon Lex. It implemented balance lookups, payments, and transaction reviews for 100K+ customers per month at concurrency peaks in the thousands. He architected warm transfers to live agents in Twilio Flex, carrying caller context in screen pops.
+
+## DrayNow, Inc. (Sept 2018 – Oct 2021)
 
 DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Senior Software Engineer owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing cross-platform React Native mobile app.
 
@@ -211,6 +251,16 @@ DrayNow was a two-sided logistics marketplace connecting truck drivers with inte
 ### Node.js Backend
 
 Built the marketplace's Node.js/Express API from scratch: custom route handlers for pricing, dispatch, and invoicing, plus custom authentication middleware protecting driver and broker endpoints.
+
+### REST API Design (Swagger/OpenAPI)
+
+Designed and documented (Swagger/OpenAPI) the REST API for the marketplace, covering brokers posting loads, drivers claiming them, pricing, dispatch, and invoicing, with one resource per concern and transactional endpoints, such as a load-claim endpoint that atomically assigned each load to exactly one driver.
+
+### PostgreSQL JSONB Query Optimization
+
+**Platform context:** Requests were failing because a PostgreSQL query against a column holding a complex JSONB array of multiple objects took too long and could not run in memory.
+
+**What Martin built:** Optimized the slow query by materializing the nested JSONB array column into a flattened table kept in sync with the source table by triggers, ensuring fast query results and consistent database state.
 
 ### DrayNow — Guaranteed Price Model Maintenance
 
