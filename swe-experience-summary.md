@@ -9,12 +9,12 @@ This document summarizes work Martin Connor personally built, verified by readin
 Resume competency lines are selected and trimmed from this list. First line on every resume is `Core Stack`, naming the hardcore basics the JD asks for.
 
 - **Core Stack** — Python, TypeScript, Node.js, Express, SQL, FastAPI, Next.js/React, React Native, REST APIs, Git, Unix shell
-- **Agent Systems** — multi-agent architecture, subagent routing, MCP servers, Vertex AI (Gemini), typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
+- **Agent Systems** — multi-agent architecture, subagent routing, MCP servers (content understanding tool over NBCU IP), Vertex AI (Gemini), typed tool-calling registries (Pydantic), tool calls, computer-use agents, prompt engineering, prompt-injection resistance, per-agent access control
 - **Virtual Agents** — platform-agnostic virtual agents, TwiML, Twilio Flex, Dialogflow CX, Amazon Lex, Watson, IVR call flows, warm transfers, screen pops
 - **Agent Optimization** — model routing, token-spend configuration, context management, conversation-history summarization, semantic response caching
 - **LLM Inference** — streaming inference runtimes (GPT/Claude/Gemini), Chat Completions to Responses API migration, streaming-event state machines, multi-turn message transformation, model migrations (GPT-3.5 to GPT-5)
-- **Retrieval & RAG** — hybrid BM25 + dense-vector retrieval, tunable blend weighting, embedding-model serving, document ingestion and vectorization pipelines (Azure Logic Apps, Azure Functions, SharePoint), content lifecycle and exclusion rules, blob cleanup
-- **Access Control** — authentication middleware (Entra ID/MS Graph), per-user RAG permission middleware, per-agent access provisioning CLI, user upsert/validation/bulk removal, Key Vault secrets, encrypted secrets injection
+- **Retrieval & RAG** — indexing and search layer, hybrid BM25 + dense-vector retrieval, semantic search, entity resolution (vector search + LLM nickname handling), tunable blend weighting, embedding-model serving, document ingestion and vectorization pipelines (Azure Logic Apps, Azure Functions, SharePoint), content lifecycle and exclusion rules, blob cleanup
+- **Access Control** — RBAC, ABAC, multi-tenant platform (business units as tenants), authentication middleware (Entra ID/MS Graph), per-user RAG permission middleware, per-agent access provisioning CLI, user upsert/validation/bulk removal, Key Vault secrets, encrypted secrets injection
 - **Compliance** — privacy impact assessments (PIA), PII and HIPAA compliance, audit log aggregation, data storage, location, and retention policies
 - **LLM Evaluation** — LLM-as-judge harnesses (DeepEval), release quality gates, WER-based speech evaluation, retrieval-accuracy measurement, generation-success metrics, feedback-correlated analytics, weak-supervision labeling
 - **Model Development** — LLM fine-tuning (GPT-3 Davinci, GPT-J 6B), INT8 quantization (bitsandbytes), constrained beam-search decoding, multi-task training schemas, neural TTS fine-tuning (RADTTS), music generation (MusicGen), PyTorch DistributedDataParallel, mixed-precision training, RAdam, warm-start transfer learning, layer freezing
@@ -23,14 +23,14 @@ Resume competency lines are selected and trimmed from this list. First line on e
 - **GPU Fleet & Job Scheduling** — PostgreSQL-backed job orchestration (pgboss), full lifecycle tracking, per-job-type retry/expiry, self-rescheduling workers, provider-agnostic dispatch (AWS EC2, RunPod, Banana.dev), inference cost optimization
 - **Inference Deployment** — containerized model serving (Docker Compose, AWS ECS/Fargate, Azure Container Apps), zero-downtime model hotswapping, CUDA-enabled Linux runtimes, GPU instance provisioning (g4dn), blob storage artifact handoff (S3), Traefik reverse proxy/TLS
 - **Event-Driven Systems** — AWS SQS/SNS, Lambda microservices, server-sent events (SSE), Slack webhook alerting, async polling, job scheduling
-- **Design Systems** — shared React component library (shadcn/ui, Tailwind), theming, design tokens, internal package publishing
+- **Design Systems** — frontend architecture, shared React component library (shadcn/ui, Tailwind), theming, design tokens, accessibility (keyboard navigation, ARIA labels, contrast compliance), internal package publishing
 - **API Design** — REST, GraphQL, Swagger/OpenAPI, FastAPI, service-oriented architecture, parameterized SQL templates
-- **Databases** — PostgreSQL, MSSQL, CosmosDB, Redis, Aurora, BigQuery, S3/blob storage, JSONB query optimization, trigger-synced materialized tables
+- **Databases** — canonical data modeling (relational), PostgreSQL, MSSQL, CosmosDB, Redis, Aurora, BigQuery, S3/blob storage, JSONB query optimization, trigger-synced materialized tables
 - **Infrastructure & Operations** — AWS (EC2/S3/SSM/Lightsail/CloudWatch/Aurora/Route 53/Lambda/Polly/ECS/Fargate), Azure (Container Apps/CosmosDB/Key Vault/Logic Apps/Functions), GCP (Vertex AI, BigQuery), Docker, Terraform, GitHub Actions, CI/CD, automated secrets injection, rollback-hardened releases, multi-environment workflow deployment
 - **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting, CloudWatch alarms (error-rate and health-check thresholds), Slack webhook alerting, on-host debugging (nvidia-smi, memory profiling), Terraform-provisioned GPU instances
 - **AI Coding Agents** — GitHub Copilot, custom agentic skills, Claude Code, CLAUDE.md/AGENTS.md conventions, token optimization, agent guardrails and context engineering
 - **Integrations** — Boomi/NetSuite, Twilio, DMV API, Microsoft Copilot agents
-- **Leadership** — led team of 4 engineers ($1.1M revenue), pre-sales architecture, SLA definition via load testing, design and code reviews
+- **Leadership** — led team of 4 engineers ($1.1M revenue), mentoring (weekly 1:1s with junior devs, weekly office hours, multiple mentees promoted), pre-sales architecture, SLA definition via load testing, design and code reviews
 
 
 ## RapBot.ai (Jan 2019 – May 2026)
@@ -161,13 +161,19 @@ Martin Connor's verified contributions span hundreds of commits across the full 
 
 **What Martin built:** A decorator-based typed tool registry where each LLM-callable tool is a self-contained class with Pydantic-validated input arguments and a generator-based execution method that can yield streaming status updates to the client before returning a final result. This pattern made it easy for the team to add new tools without touching the core inference layer. Martin implemented multiple production tool handlers: hybrid search, downstream Copilot agent dispatch (authenticating against Key Vault, calling Ad Sales and HR Thrive agents), BigQuery schema retrieval, SQL aggregation via parameterized templates, and a vector search refactor into the typed registry pattern.
 
+### Prism MCP Server: Content Understanding Tool
+
+**Platform context:** Prism agents and external engineers needed a standard way to pull analysis of NBCU intellectual property, such as TV shows and movies, into agent workflows.
+
+**What Martin built:** Built and maintained an MCP server for Prism exposing a content understanding tool that returns structured analysis of NBCU IP, including TV shows, movies, and structured descriptions of their visual assets. Martin owned the server's authentication, latency tuning, and developer documentation so other engineers could build on it.
+
 ### Multi-Agent Platform Architecture
 
 **Platform context:** Prism hosts multiple specialized AI agents serving different NBCU business units, each with different knowledge bases, personas, tool sets, and access control requirements.
 
 **What Martin built:** Martin architected and deployed several production agents from scratch:
 
-- **Atlas Assist (legal agent):** Legal research agent serving NBCU employees with questions about contracts, firm contacts, and legal resources. Martin built Legal Lookup and Firm Finder subagents that route specific query types to SharePoint-sourced knowledge bases via structured tool calls. He wrote and iterated the system prompt, added intelligent nickname handling so the agent could match formal legal names when users provided informal ones, and added prompt injection resistance.
+- **Atlas Assist (legal agent):** Legal research agent serving NBCU employees with questions about contracts, firm contacts, and legal resources. Martin built Legal Lookup and Firm Finder subagents that route specific query types to SharePoint-sourced knowledge bases via structured tool calls. He wrote and iterated the system prompt, added prompt injection resistance, and built entity resolution for firm and attorney lookups: vector search over firm and attorney names plus LLM-based nickname handling that maps a user's informal input to one canonical firm or contact record.
 - **HR Thrive:** HR knowledge agent built from initial configuration through production — system prompt design, RAG corpus setup, user access provisioning, and suggested prompt curation. Reduced HR Tier-1 response time 10%.
 - **OmniAgent:** General-purpose agent; Martin managed access provisioning and brand identity.
 - **Computer-use agent:** Replaced a brittle legacy media-fulfillment integration by autonomously completing intake workflows, cutting average response time 0.5 days.
@@ -192,6 +198,12 @@ All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model g
 
 **What Martin built:** Hand-rolled authorization middleware for the RAG pipeline. When a user's question would be answered by a SharePoint document, the middleware checked that user's Entra ID identity against the document's permissions via the Microsoft Graph API before the content could reach the agent's answer. Locked-down documents never surfaced to users who lacked access.
 
+### RBAC and ABAC on a Multi-Tenant Platform
+
+**Platform context:** Prism serves multiple NBCU business units (legal, HR, ad sales, media operations) on one deployment, so each business unit is effectively a tenant with its own agents, knowledge bases, and users.
+
+**What Martin built:** Role-based access control through per-agent role grants and revocations (the user access CLI above), and attribute-based access control through per-user document permissions checked against Entra ID identity and Microsoft Graph before retrieval results reach the agent. Per-business-unit configuration (for example the semantic response cache) kept tenants isolated.
+
 ### Token-Spend Controls (Agent Optimization)
 
 **Platform context:** Prism serves many business units whose queries range from simple lookups to multi-document reasoning, and sending everything to the largest model wasted tokens.
@@ -208,7 +220,7 @@ All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model g
 
 **Platform context:** Prism Portal is the agentic user interface for the Prism platform. As other NBCU teams began building their own agent interfaces, design consistency across teams became a problem.
 
-**What Martin built:** Martin's team built and maintained Prism Portal's shared React/TypeScript component library, starting from shadcn/ui and Tailwind. It grew into an internal package with theming and design tokens that was published so other NBCU teams could build agent interfaces with consistent UI.
+**What Martin built:** Martin's team built and maintained Prism Portal's shared React/TypeScript component library, starting from shadcn/ui and Tailwind. It grew into an internal package with theming and design tokens that was published so other NBCU teams could build agent interfaces with consistent UI. Martin established the frontend architecture for the library and its accessibility standards: keyboard navigation, ARIA labels, and contrast compliance.
 
 ### Vertex AI Multi-Agent Guest Assistant
 
@@ -219,6 +231,10 @@ Built a multi-agent guest assistant on GCP Vertex AI for a theme park: agents wi
 **Platform context:** As part of NBCU's world-model exploration, Martin ran NVIDIA's Lyra-2 world model for splat inference on a g7e.2xlarge EC2 instance provisioned with Terraform. Splat libraries compile their CUDA kernels on first import, and the compile step kept crashing.
 
 **What Martin built:** Working over SSH on the host, Martin diagnosed the crashes as out-of-memory kills during CUDA kernel compilation: the MAX_JOBS setting was launching too many parallel compiler processes and exhausting host memory. He capped MAX_JOBS at 4, holding memory usage near 60% while preserving build speed, and inference ran cleanly after the fix.
+
+### Mentoring and Architecture Leadership
+
+Martin mentors engineers on architecture and code quality: weekly one-on-ones with every junior developer on his squad, weekly open office hours for anyone on the platform, and design and code reviews. Multiple mentees have been promoted.
 
 ### AI Coding Agents in Daily Work
 
@@ -251,6 +267,10 @@ DrayNow was a two-sided logistics marketplace connecting truck drivers with inte
 ### Node.js Backend
 
 Built the marketplace's Node.js/Express API from scratch: custom route handlers for pricing, dispatch, and invoicing, plus custom authentication middleware protecting driver and broker endpoints.
+
+### Canonical PostgreSQL Data Model
+
+Martin defined the marketplace's canonical PostgreSQL data model himself: the tables and relationships for brokers, loads, drivers, pricing, dispatch, and invoicing.
 
 ### REST API Design (Swagger/OpenAPI)
 
