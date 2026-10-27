@@ -30,6 +30,8 @@ Resume competency lines are selected and trimmed from this list. First line on e
 - **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting, CloudWatch alarms (error-rate and health-check thresholds), Slack webhook alerting, on-host debugging (nvidia-smi, memory profiling), Terraform-provisioned GPU instances
 - **AI Coding Agents** — GitHub Copilot, custom agentic skills, Claude Code, CLAUDE.md/AGENTS.md conventions, token optimization, agent guardrails and context engineering
 - **Integrations** — Boomi/NetSuite, Twilio, DMV API, Microsoft Copilot agents
+- **Open Source** — merged PRs to third-party repos (Cordova InstagramPlugin AndroidX migration, mondrian-generator)
+- **Customer-Facing Engineering** — on-site customer engagements, technical workshops, customer engineer training and handoff, internal business customers (Legal, HR, Global Media Operations)
 - **Leadership** — led team of 4 engineers ($1.1M revenue), mentoring (weekly 1:1s with junior devs, weekly office hours, multiple mentees promoted), pre-sales architecture, SLA definition via load testing, design and code reviews
 
 
@@ -176,7 +178,7 @@ Martin Connor's verified contributions span hundreds of commits across the full 
 - **Atlas Assist (legal agent):** Legal research agent serving NBCU employees with questions about contracts, firm contacts, and legal resources. Martin built Legal Lookup and Firm Finder subagents that route specific query types to SharePoint-sourced knowledge bases via structured tool calls. He wrote and iterated the system prompt, added prompt injection resistance, and built entity resolution for firm and attorney lookups: vector search over firm and attorney names plus LLM-based nickname handling that maps a user's informal input to one canonical firm or contact record.
 - **HR Thrive:** HR knowledge agent built from initial configuration through production — system prompt design, RAG corpus setup, user access provisioning, and suggested prompt curation. Reduced HR Tier-1 response time 10%.
 - **OmniAgent:** General-purpose agent; Martin managed access provisioning and brand identity.
-- **Computer-use agent:** Replaced a brittle legacy media-fulfillment integration by autonomously completing intake workflows, cutting average response time 0.5 days.
+- **Computer-use agent (Global Media Operations):** Built at the request of an internal business customer, Global Media Operations. Replaced a brittle legacy media-fulfillment integration by autonomously completing media asset intake and tracking workflows, cutting the team's asset management hours 40% (5 hours a week, 250+ hours a year) and average response time 0.5 days. Atlas Assist (Legal) and HR Thrive (HR) were likewise built for internal business customers.
 
 All agents were maintained and iterated across GPT-3.5, GPT-4, and GPT-5 model generations.
 
@@ -258,6 +260,10 @@ Waterfield built cloud contact-center platforms for external clients, productizi
 
 **What Martin built:** A platform-agnostic virtual agent running on Twilio (TwiML) and portable to Dialogflow CX and Amazon Lex. It implemented balance lookups, payments, and transaction reviews for 100K+ customers per month at concurrency peaks in the thousands. He architected warm transfers to live agents in Twilio Flex, carrying caller context in screen pops.
 
+### Customer-Facing Engineering (Navient)
+
+Martin was the customer-facing engineer on the Navient engagement. He flew on-site to work with Navient's team and drive adoption, led workshops with their engineers, and trained them to maintain the virtual agent platform themselves once it reached steady state.
+
 ## DrayNow, Inc. (Sept 2018 – Oct 2021)
 
 DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Senior Software Engineer owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing cross-platform React Native mobile app.
@@ -285,3 +291,21 @@ Designed and documented (Swagger/OpenAPI) the REST API for the marketplace, cove
 ### DrayNow — Guaranteed Price Model Maintenance
 
 DrayNow's marketplace listed freight at a "guaranteed price," a model-suggested price at which a load would be picked up by a driver 98% of the time, trained on historical pricing data. Martin maintained this model in production. He monitored a rolling one-month pickup rate against the 98% target, comparing any drop against the normal month-to-month spread of the rate — drops within the usual spread meant wait, drops several times larger meant investigate. When investigation was warranted, he diagnosed and fixed the degradation: retraining on newer data, adjusting for seasonal price shifts (e.g. holiday-season spikes), or rolling back to a prior model version stored in S3 when anomalies like mass order cancellations had polluted recent data.
+
+## Open Source Contributions
+
+### Cordova InstagramPlugin: AndroidX Build Fix
+
+**Platform context:** vstirbu/InstagramPlugin is a Cordova plugin for sharing to Instagram. Its Android code imported the deprecated `android.support.v4` library, which broke builds for apps that had migrated to AndroidX.
+
+**What Martin built:** Migrated the plugin's Android sources (`CDVInstagramPlugin.java`, `AssetProvider.java`) from `android.support.v4.content.FileProvider` to `androidx.core.content.FileProvider`, restoring the Android build for AndroidX apps. Merged upstream.
+
+Link: https://github.com/vstirbu/InstagramPlugin/pull/119/changes
+
+### mondrian-generator: Modularization and Local Dev
+
+**Platform context:** JEFworks/mondrian-generator is a JavaScript project used to teach young girls to code by generating Mondrian-style paintings in the browser.
+
+**What Martin built:** PR #1 (merged Nov 2020, +107/-47): modularized the code into smaller reusable functions, added an `index.html` so the project runs locally, condensed code with ES6 syntax, fixed RYB color hex codes that did not match CSS standards, made variable names more specific, and replaced a save button with a toggleable auto-save feature. Martin helped maintain the project.
+
+Link: https://github.com/JEFworks/mondrian-generator/pull/1
