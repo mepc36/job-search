@@ -30,8 +30,9 @@ Resume competency lines are selected and trimmed from this list. First line on e
 - **Observability** — Datadog APM distributed tracing, per-user/per-agent span tagging, Datadog RUM and session replay, Amplitude session enrichment, structured error alerting, CloudWatch alarms (error-rate and health-check thresholds), Slack webhook alerting, on-host debugging (nvidia-smi, memory profiling), Terraform-provisioned GPU instances
 - **AI Coding Agents** — GitHub Copilot, custom agentic skills, Claude Code, CLAUDE.md/AGENTS.md conventions, token optimization, agent guardrails and context engineering
 - **Integrations** — Boomi/NetSuite, Twilio, DMV API, Microsoft Copilot agents
-- **Open Source** — merged PRs to third-party repos (Cordova InstagramPlugin AndroidX migration, mondrian-generator)
+- **Open Source** — merged upstream contributions to the Apache Cordova plugin ecosystem (InstagramPlugin AndroidX migration) and an educational JavaScript project (mondrian-generator)
 - **Customer-Facing Engineering** — on-site customer engagements, technical workshops, customer engineer training and handoff, internal business customers (Legal, HR, Global Media Operations)
+- **Product Feedback** — net promoter score tracking, feedback-to-roadmap pipeline (in-app form to Jira API triage board)
 - **Leadership** — led team of 4 engineers ($1.1M revenue), mentoring (weekly 1:1s with junior devs, weekly office hours, multiple mentees promoted), pre-sales architecture, SLA definition via load testing, design and code reviews
 
 
@@ -128,6 +129,14 @@ All five services were Docker-containerized and coordinated by the job schedulin
 ### Server-Sent Events for Long-Running Jobs
 
 Hand-rolled a server-sent event stream that pushed completion events for long-running media transcoding and audio synthesis jobs back to the React frontend, replacing long polling. Users could fire a synthesis request and keep writing lyrics while it ran, so traffic stayed smooth instead of bursty, and every job's lifecycle was visible for auditing through the GPU job scheduler.
+
+### User Feedback to Roadmap Pipeline
+
+As founder Martin talked with users daily and tracked net promoter score. Every in-app form submission was piped through the Jira API into a triage board that was groomed weekly against NPS trends to prioritize features and fixes.
+
+### STT Evaluation Tooling for QA
+
+Built an evaluation application for the QA team to assess model outputs: an automated harness scoring STT models on WER against transcription logs pulled from production, domain-specific evaluation datasets (slang, accents), and a results dashboard for visibility into model quality.
 
 ### Node.js Backend
 
@@ -264,7 +273,7 @@ Waterfield built cloud contact-center platforms for external clients, productizi
 
 Martin was the customer-facing engineer on the Navient engagement. He flew on-site to work with Navient's team and drive adoption, led workshops with their engineers, and trained them to maintain the virtual agent platform themselves once it reached steady state.
 
-## DrayNow, Inc. (Sept 2018 – Oct 2021)
+## DrayNow, Inc. (Sept 2019 – Oct 2021)
 
 DrayNow was a two-sided logistics marketplace connecting truck drivers with intermodal freight brokers. Martin was a Senior Software Engineer owning revenue-critical workflows across pricing, dispatch, invoicing, and the customer-facing cross-platform React Native mobile app.
 
